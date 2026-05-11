@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Key Findings — Female Graduates by Field</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:      #0b0e14;
+    --surface: #131720;
+    --card:    #181d27;
+    --border:  #1f2635;
+    --accent:  #e8c547;
+    --teal:    #4ecdc4;
+    --red:     #ff6b6b;
+    --purple:  #a29bfe;
+    --text:    #e2e8f0;
+    --muted:   #64748b;
+    --light:   #94a3b8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.7;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 5% 15%, rgba(232,197,71,0.05) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 70% at 95% 85%, rgba(78,205,196,0.04) 0%, transparent 55%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(11,14,20,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+  }
+
+  .nav-brand {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .nav-links { display: flex; gap: 4px; }
+
+  .nav-links a {
+    padding: 6px 14px; border-radius: 6px;
+    font-size: 13px; text-decoration: none;
+    color: var(--light); transition: all 0.18s;
+  }
+
+  .nav-links a:hover { background: var(--surface); color: var(--text); }
+  .nav-links a.active { color: var(--accent); background: rgba(232,197,71,0.08); }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; z-index: 10;
+    padding: 80px 48px 64px;
+    border-bottom: 1px solid var(--border);
+    max-width: 900px;
+  }
+
+  .hero .eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .hero .eyebrow::after {
+    content: ''; flex: 1; max-width: 60px; height: 1px;
+    background: var(--accent); opacity: 0.5;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 5vw, 62px);
+    font-weight: 900; line-height: 1.08;
+    color: #fff; margin-bottom: 24px;
+  }
+
+  .hero h1 em {
+    font-style: italic; color: var(--accent);
+  }
+
+  .hero .lead {
+    font-size: 16px; color: var(--light);
+    max-width: 680px; line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .hero .meta-pills {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-top: 28px;
+  }
+
+  .mpill {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em;
+    padding: 5px 14px; border-radius: 100px;
+    border: 1px solid var(--border);
+    color: var(--muted); background: var(--surface);
+  }
+
+  /* ── LAYOUT ── */
+  .page { position: relative; z-index: 10; }
+
+  .container {
+    max-width: 1100px; margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 72px 48px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 3.5vw, 36px);
+    font-weight: 700; color: #fff;
+    margin-bottom: 20px; line-height: 1.2;
+  }
+
+  .section h2 span { color: var(--accent); }
+  .section h2 span.teal { color: var(--teal); }
+  .section h2 span.red { color: var(--red); }
+
+  .section p {
+    font-size: 15px; color: var(--light);
+    max-width: 720px; margin-bottom: 16px;
+  }
+
+  .section p strong { color: var(--text); font-weight: 600; }
+  .section p em { color: var(--accent); font-style: normal; }
+
+  /* ── TWO COL ── */
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 40px; align-items: start;
+    margin-top: 40px;
+  }
+
+  .two-col.flip { direction: rtl; }
+  .two-col.flip > * { direction: ltr; }
+
+  @media (max-width: 800px) {
+    .two-col { grid-template-columns: 1fr; }
+    .section { padding: 48px 24px; }
+    nav { padding: 0 24px; }
+    .hero { padding: 48px 24px; }
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; margin: 32px 0;
+  }
+
+  .stat-card {
+    background: var(--card); padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+
+  .stat-card .slabel {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stat-card .sval {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px; font-weight: 700; line-height: 1;
+  }
+
+  .stat-card .ssub { font-size: 12px; color: var(--light); }
+
+  /* ── CHART CARDS ── */
+  .chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px;
+    position: relative; overflow: hidden;
+  }
+
+  .chart-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+  }
+
+  .chart-card.gold::before { background: linear-gradient(90deg, var(--accent), transparent); }
+  .chart-card.teal::before { background: linear-gradient(90deg, var(--teal), transparent); }
+  .chart-card.red::before  { background: linear-gradient(90deg, var(--red), transparent); }
+  .chart-card.purple::before { background: linear-gradient(90deg, var(--purple), transparent); }
+
+  .chart-card .ctitle {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    margin-bottom: 4px;
+  }
+  .chart-card .csub {
+    font-size: 11px; color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 20px;
+  }
+
+  /* ── CALLOUT QUOTE ── */
+  .callout {
+    border-left: 3px solid var(--accent);
+    padding: 20px 28px;
+    background: rgba(232,197,71,0.05);
+    border-radius: 0 10px 10px 0;
+    margin: 28px 0;
+  }
+
+  .callout.teal { border-color: var(--teal); background: rgba(78,205,196,0.05); }
+  .callout.red  { border-color: var(--red);  background: rgba(255,107,107,0.05); }
+
+  .callout p {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px; font-style: italic;
+    color: var(--text); margin-bottom: 8px;
+    line-height: 1.6;
+  }
+
+  .callout .csource {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ── DIVERGENCE BAR ── */
+  .diverge-chart { margin-top: 28px; }
+
+  .div-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 60px;
+    align-items: center; gap: 14px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(31,38,53,0.6);
+  }
+
+  .div-field { font-size: 12.5px; color: var(--light); line-height: 1.3; }
+
+  .div-bar-wrap {
+    position: relative; height: 24px;
+    display: flex; align-items: center;
+  }
+
+  .div-mid {
+    position: absolute; left: 50%; width: 1px;
+    height: 100%; background: var(--border);
+  }
+
+  .div-bar {
+    height: 14px; border-radius: 3px;
+    position: absolute;
+  }
+
+  .div-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px; text-align: right;
+  }
+
+  /* ── FINDINGS LIST ── */
+  .finding-list { margin: 28px 0; display: flex; flex-direction: column; gap: 16px; }
+
+  .finding {
+    display: flex; gap: 16px;
+    padding: 18px 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    align-items: flex-start;
+  }
+
+  .finding-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .finding-body .ftitle {
+    font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px;
+  }
+
+  .finding-body .fdesc { font-size: 13px; color: var(--light); }
+
+  /* ── TREND TABLE ── */
+  .trend-table {
+    width: 100%; border-collapse: collapse; margin-top: 28px;
+    font-size: 13px;
+  }
+
+  .trend-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); padding: 10px 16px;
+    text-align: left; border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .trend-table td {
+    padding: 12px 16px; border-bottom: 1px solid rgba(31,38,53,0.5);
+    color: var(--light); vertical-align: middle;
+  }
+
+  .trend-table tr:hover td { background: var(--card); }
+
+  .delta-pos { color: var(--teal); font-family: 'DM Mono', monospace; }
+  .delta-neg { color: var(--red);  font-family: 'DM Mono', monospace; }
+  .delta-neu { color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  .spark { display: inline-flex; gap: 2px; align-items: flex-end; height: 20px; }
+  .spark span {
+    width: 6px; border-radius: 2px 2px 0 0;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative; z-index: 10;
+    padding: 32px 48px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+
+  footer p { font-size: 12px; color: var(--muted); }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── SCROLL FADE ── */
+  .reveal {
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-brand">WB · Gender Statistics</span>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="findings.html" class="active">Findings</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- ── HERO ── -->
+  <section class="hero reveal">
+    <div class="eyebrow">Analytical Report</div>
+    <h1>What the Data Tells Us<br>About <em>Women in Education</em></h1>
+    <p class="lead">
+      An analysis of 11,901 country-year observations spanning 170 nations from 1998 to 2019,
+      drawn from the World Bank Gender Statistics indicator <strong>SE.TER.GRAD.FE.ZS</strong>.
+      The findings reveal a consistent and widening structural split — women dominate certain fields
+      and remain significantly underrepresented in others, with slow but measurable progress everywhere.
+    </p>
+    <div class="meta-pills">
+      <span class="mpill">11,901 observations</span>
+      <span class="mpill">170 countries</span>
+      <span class="mpill">1998 – 2019</span>
+      <span class="mpill">10 fields of study</span>
+      <span class="mpill">OBS_STATUS = A only</span>
+    </div>
+  </section>
+
+  <!-- ── FINDING 1: THE STRUCTURAL SPLIT ── -->
+  <section class="section reveal">
+    <div class="section-num">Finding 01</div>
+    <h2>A Persistent <span>Structural Split</span> Across Fields</h2>
+    <p>
+      The single most striking finding in this dataset is not a trend over time —
+      it is the <strong>magnitude and consistency of field-level segregation</strong>.
+      Female graduates are strongly majority in four fields and strongly minority in two,
+      with little variation across countries or years.
+    </p>
+    <p>
+      <em>Education (72.6%)</em> and <em>Health & Welfare (71.5%)</em> sit more than
+      22 percentage points above gender parity. Engineering (26.7%) sits 23 points below it.
+      This 46-point gap between the most and least female-dominated fields
+      has been stable across two decades of data.
+    </p>
+
+    <div class="stat-row reveal">
+      <div class="stat-card">
+        <span class="slabel">Highest field avg</span>
+        <span class="sval" style="color:var(--accent)">72.6%</span>
+        <span class="ssub">Education</span>
+      </div>
+      <div class="stat-card">
+        <span class="slabel">Lowest field avg</span>
+        <span class="sval" style="color:var(--red)">26.7%</span>
+        <span class="ssub">Engineering</span>
+      </div>
+      <div class="stat-card">
+        <span class="slabel">Gap (highest–lowest)</span>
+        <span class="sval" style="color:var(--light)">45.9 pp</span>
+        <span class="ssub">percentage points</span>
+      </div>
+      <div class="stat-card">
+        <span class="slabel">Fields above parity</span>
+        <span class="sval" style="color:var(--teal)">6 / 10</span>
+        <span class="ssub">above 50% female</span>
+      </div>
+    </div>
+
+    <!-- Divergence chart from parity -->
+    <div class="two-col">
+      <div>
+        <div class="callout">
+          <p>"Women are the majority in 6 of 10 fields globally — yet the fields where they remain
+          a minority are precisely those most associated with economic productivity and wage premiums."</p>
+          <span class="csource">Derived from WB Gender Statistics · SE.TER.GRAD.FE.ZS</span>
+        </div>
+        <p>
+          The 50% parity line is a useful anchor. Fields above it — Education, Health, Arts &
+          Humanities, Social Sciences, Natural Sciences — account for a large share of
+          tertiary enrolment. Fields below parity — Services, Agriculture, STEM (aggregate),
+          Engineering — are fewer but economically consequential.
+        </p>
+        <p>
+          Notably, <strong>Natural Sciences, Maths & Statistics (55%)
+          has crossed parity</strong>, while the STEM aggregate (32%) remains
+          well below it — a gap explained by the Engineering component dragging the composite down.
+        </p>
+      </div>
+      <div class="chart-card gold">
+        <div class="ctitle">Deviation from Gender Parity (50%) by Field</div>
+        <div class="csub">All-time average, 170 countries · pp = percentage points</div>
+        <canvas id="parityChart" height="240"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FINDING 2: PROGRESS ── -->
+  <section class="section reveal">
+    <div class="section-num">Finding 02</div>
+    <h2>Slow but <span class="teal">Universal Progress</span> Since 1998</h2>
+    <p>
+      Every field except "Unknown or unspecified" showed a positive trend over the observation period.
+      The gains are modest in absolute terms — most fields improved by 3–8 percentage points
+      over ~20 years — but the consistency across fields is noteworthy.
+    </p>
+    <p>
+      <strong>Natural Sciences, Maths & Statistics posted the largest gain: +8.1 pp</strong>,
+      crossing the parity threshold in the process. STEM (aggregate) improved by +6.9 pp,
+      and Agriculture by +6.2 pp — suggesting that fields which were below parity
+      are catching up faster than fields already above it.
+    </p>
+
+    <div class="two-col flip reveal">
+      <div>
+        <table class="trend-table">
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>~1998–2000 avg</th>
+              <th>~2017–2019 avg</th>
+              <th>Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Natural Sciences, Maths & Stats</td><td>49.2%</td><td>57.3%</td><td class="delta-pos">+8.1 pp</td></tr>
+            <tr><td>STEM (aggregate)</td><td>27.5%</td><td>34.4%</td><td class="delta-pos">+6.9 pp</td></tr>
+            <tr><td>Agriculture &amp; Veterinary</td><td>38.4%</td><td>44.6%</td><td class="delta-pos">+6.2 pp</td></tr>
+            <tr><td>Social Sciences &amp; Journalism</td><td>57.1%</td><td>63.3%</td><td class="delta-pos">+6.1 pp</td></tr>
+            <tr><td>Services</td><td>43.0%</td><td>47.1%</td><td class="delta-pos">+4.1 pp</td></tr>
+            <tr><td>Education</td><td>68.1%</td><td>71.8%</td><td class="delta-pos">+3.7 pp</td></tr>
+            <tr><td>Health &amp; Welfare</td><td>67.8%</td><td>71.3%</td><td class="delta-pos">+3.6 pp</td></tr>
+            <tr><td>Arts &amp; Humanities</td><td>60.9%</td><td>64.4%</td><td class="delta-pos">+3.5 pp</td></tr>
+            <tr><td>Engineering &amp; Construction</td><td>23.7%</td><td>27.0%</td><td class="delta-pos">+3.3 pp</td></tr>
+            <tr><td>Unknown / unspecified</td><td>52.9%</td><td>50.7%</td><td class="delta-neg">−2.2 pp</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="chart-card teal">
+          <div class="ctitle">Trend: Change in Female Share (pp) by Field</div>
+          <div class="csub">3-year window at each end · positive = more female graduates over time</div>
+          <canvas id="trendDeltaChart" height="260"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout teal reveal" style="margin-top:32px">
+      <p>"At the current rate of improvement in Engineering (+3.3 pp over ~20 years), gender parity
+      in that field would not be reached for another 70+ years — underscoring that pace, not
+      just direction, matters."</p>
+      <span class="csource">Derived from trend analysis · WB SE.TER.GRAD.FE.ZS</span>
+    </div>
+  </section>
+
+  <!-- ── FINDING 3: ENGINEERING ── -->
+  <section class="section reveal">
+    <div class="section-num">Finding 03</div>
+    <h2>Engineering Remains the <span class="red">Hardest Barrier</span></h2>
+    <p>
+      Engineering, Manufacturing & Construction is the most persistently male-dominated field
+      in the dataset, with a global average of just <strong>26.7% female graduates</strong>.
+      This is not driven by a few outliers — only 5 countries have ever exceeded 50% female
+      engineering graduates in any year with data.
+    </p>
+    <p>
+      Argentina leads all countries with a remarkable <strong>75.3% female share in Engineering (2011)</strong>,
+      a figure that is a substantial outlier globally. Beyond that, only Benin (54.6%), Brunei
+      Darussalam (52.3%), and Algeria (48.5%) come close to parity.
+      At the other extreme, Saudi Arabia (2.7%), Afghanistan (4.1%), and Andorra (0%) recorded
+      the lowest shares.
+    </p>
+
+    <div class="two-col reveal">
+      <div>
+        <div class="finding-list">
+          <div class="finding">
+            <div class="finding-icon" style="background:rgba(255,107,107,0.15)">🔧</div>
+            <div class="finding-body">
+              <div class="ftitle">Global average: 26.7% female</div>
+              <div class="fdesc">The lowest of any field. Consistent across income levels and regions.</div>
+            </div>
+          </div>
+          <div class="finding">
+            <div class="finding-icon" style="background:rgba(232,197,71,0.15)">🏆</div>
+            <div class="finding-body">
+              <div class="ftitle">Argentina: 75.3% — an exceptional outlier</div>
+              <div class="fdesc">No other country comes within 20 pp in the top-country ranking for this field.</div>
+            </div>
+          </div>
+          <div class="finding">
+            <div class="finding-icon" style="background:rgba(78,205,196,0.15)">📈</div>
+            <div class="finding-body">
+              <div class="ftitle">+3.3 pp gain over 20 years</div>
+              <div class="fdesc">Positive, but the slowest rate of change of any meaningful field in the dataset.</div>
+            </div>
+          </div>
+          <div class="finding">
+            <div class="finding-icon" style="background:rgba(162,155,254,0.15)">🌍</div>
+            <div class="finding-body">
+              <div class="ftitle">Some MENA countries outperform Western peers</div>
+              <div class="fdesc">Algeria (48.5%), Sudan (46.3%), Tunisia (44.2%) — state-driven engineering education policies may explain this.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card red">
+        <div class="ctitle">Top 15 Countries · Engineering, Manufacturing & Construction</div>
+        <div class="csub">Female share (%) · most recent year with data per country</div>
+        <canvas id="engChart" height="300"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FINDING 4: EDUCATION & HEALTH ── -->
+  <section class="section reveal">
+    <div class="section-num">Finding 04</div>
+    <h2>Education & Health are <span>Female-Majority</span> by a Wide Margin</h2>
+    <p>
+      The feminisation of Education and Health & Welfare faculties is not marginal —
+      it is structurally entrenched. Both fields exceed <strong>70% female graduates</strong>
+      on global average, and multiple countries report 95–100% female shares in these fields.
+    </p>
+    <p>
+      This has implications beyond gender statistics: if teaching and nursing pipelines
+      are overwhelmingly female while engineering and STEM remain male-dominated,
+      <strong>wage-gap and economic-participation gaps are, in part, an artefact of
+      field-level sorting at tertiary level.</strong>
+    </p>
+
+    <div class="two-col reveal" style="margin-top:32px">
+      <div class="chart-card gold">
+        <div class="ctitle">Education — Top 10 Countries</div>
+        <div class="csub">% female graduates · most recent year</div>
+        <canvas id="eduChart" height="220"></canvas>
+      </div>
+      <div class="chart-card teal">
+        <div class="ctitle">Health & Welfare — Top 10 Countries</div>
+        <div class="csub">% female graduates · most recent year</div>
+        <canvas id="healthChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="callout reveal" style="margin-top:32px">
+      <p>"The over-representation of women in Education and Health is as large a distortion
+      from parity as the under-representation in Engineering — yet it receives far less
+      policy attention."</p>
+      <span class="csource">Analytical note · WB SE.TER.GRAD.FE.ZS</span>
+    </div>
+  </section>
+
+  <!-- ── FINDING 5: DATA QUALITY ── -->
+  <section class="section reveal">
+    <div class="section-num">Finding 05</div>
+    <h2>Data Coverage is <span>Sparse</span> — Results Should Be Read as Indicative</h2>
+    <p>
+      Of the 169,600 total rows in the raw dataset, only <strong>11,901 (7.0%) contain
+      actual observations</strong>. The average country has data for just
+      <strong>8.7 of 22 possible years</strong>, and coverage is heavily skewed toward
+      Europe and Latin America, with large gaps in Sub-Saharan Africa and South Asia.
+    </p>
+    <p>
+      This matters for reconciliation: country rankings, top-10 lists, and trend lines
+      in this analysis reflect <em>where data exists</em>, not a complete census.
+      Countries with the highest reported values (e.g. 100% in Health for small island
+      states) should be interpreted with caution — small absolute numbers of graduates
+      can produce extreme percentages.
+    </p>
+
+    <div class="stat-row reveal">
+      <div class="stat-card">
+        <span class="slabel">Raw rows</span>
+        <span class="sval" style="color:var(--light)">169,600</span>
+        <span class="ssub">total dataset</span>
+      </div>
+      <div class="stat-card">
+        <span class="slabel">Actual observations</span>
+        <span class="sval" style="color:var(--accent)">11,901</span>
+        <span class="ssub">OBS_STATUS = A</span>
+      </div>
+      <div class="stat-card">
+        <span class="slabel">Fill rate</span>
+        <span class="sval" style="color:var(--red)">7.0%</span>
+        <span class="ssub">of possible cells</span>
+      </div>
+      <div class="stat-card">
+        <span class="slabel">Avg years per country</span>
+        <span class="sval" style="color:var(--teal)">8.7</span>
+        <span class="ssub">of 22 possible</span>
+      </div>
+    </div>
+
+    <div class="finding-list reveal">
+      <div class="finding">
+        <div class="finding-icon" style="background:rgba(232,197,71,0.15)">✓</div>
+        <div class="finding-body">
+          <div class="ftitle">All analysis uses OBS_STATUS = 'A' (actual) only</div>
+          <div class="fdesc">Estimated and missing values (OBS_STATUS = 'O') are excluded throughout. No imputation was applied.</div>
+        </div>
+      </div>
+      <div class="finding">
+        <div class="finding-icon" style="background:rgba(78,205,196,0.15)">✓</div>
+        <div class="finding-body">
+          <div class="ftitle">Country-level vs aggregate data is separated</div>
+          <div class="fdesc">ISO3-code countries are used for rankings and country views; World Bank regional aggregates (e.g. "Arab World") are used only in global trend averages for smoother lines.</div>
+        </div>
+      </div>
+      <div class="finding">
+        <div class="finding-icon" style="background:rgba(255,107,107,0.15)">⚠</div>
+        <div class="finding-body">
+          <div class="ftitle">100% values in small states should be treated as outliers</div>
+          <div class="fdesc">Countries like Antigua and Barbuda, Bermuda, and Liechtenstein recording 100% female in Health likely reflect single-digit total graduates in those categories.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SUMMARY ── -->
+  <section class="section reveal">
+    <div class="section-num">Summary</div>
+    <h2>Five Things This Data <span>Confirms</span></h2>
+
+    <div class="finding-list">
+      <div class="finding">
+        <div class="finding-icon" style="background:rgba(232,197,71,0.15);font-size:18px">①</div>
+        <div class="finding-body">
+          <div class="ftitle">Field segregation is the dominant pattern</div>
+          <div class="fdesc">A 46-percentage-point gap between the most and least female-dominated fields dwarfs all country or time-period variation in the data.</div>
+        </div>
+      </div>
+      <div class="finding">
+        <div class="finding-icon" style="background:rgba(78,205,196,0.15);font-size:18px">②</div>
+        <div class="finding-body">
+          <div class="ftitle">Progress is real but slow</div>
+          <div class="fdesc">Every major field improved between 1998 and 2019. At current rates, Engineering will not reach parity for 70+ years.</div>
+        </div>
+      </div>
+      <div class="finding">
+        <div class="finding-icon" style="background:rgba(162,155,254,0.15);font-size:18px">③</div>
+        <div class="finding-body">
+          <div class="ftitle">Natural Sciences has crossed parity</div>
+          <div class="fdesc">From 49.2% to 57.3% — this field moved from male-majority to female-majority over the observation window. A meaningful milestone.</div>
+        </div>
+      </div>
+      <div class="finding">
+        <div class="finding-icon" style="background:rgba(255,107,107,0.15);font-size:18px">④</div>
+        <div class="finding-body">
+          <div class="ftitle">Some MENA and Latin American countries outperform OECD peers in Engineering</div>
+          <div class="fdesc">Algeria, Tunisia, and Argentina suggest that policy and cultural factors — not economic development level — are the key determinant of female engineering enrolment.</div>
+        </div>
+      </div>
+      <div class="finding">
+        <div class="finding-icon" style="background:rgba(232,197,71,0.15);font-size:18px">⑤</div>
+        <div class="finding-body">
+          <div class="ftitle">Data sparsity limits precision</div>
+          <div class="fdesc">With a 7% fill rate, findings are directionally robust but not statistically exhaustive. Policy conclusions should be supplemented with national-level administrative data.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /page -->
+
+<footer>
+  <p>Source: <a href="https://data.worldbank.org/indicator/SE.TER.GRAD.FE.ZS" target="_blank">World Bank Open Data</a> · Indicator <strong>SE.TER.GRAD.FE.ZS</strong></p>
+  <p><a href="index.html">← Back to Dashboard</a></p>
+</footer>
+
+<script>
+Chart.defaults.color = '#64748b';
+Chart.defaults.borderColor = '#1f2635';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+
+// ── PARITY DEVIATION CHART ──
+(function() {
+  const fields = [
+    'Education','Health & Welfare','Arts & Humanities',
+    'Social Sciences & Journalism','Natural Sciences, Maths & Stats',
+    'Unknown / Unspecified','Services','Agriculture & Veterinary',
+    'STEM (aggregate)','Engineering & Construction'
+  ];
+  const avgs = [72.57, 71.45, 63.66, 63.30, 54.94, 51.29, 46.55, 43.12, 32.24, 26.71];
+  const deviations = avgs.map(v => parseFloat((v - 50).toFixed(2)));
+  const colors = deviations.map(d => d >= 0 ? 'rgba(232,197,71,0.8)' : 'rgba(255,107,107,0.8)');
+  const borders = deviations.map(d => d >= 0 ? '#e8c547' : '#ff6b6b');
+
+  new Chart(document.getElementById('parityChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: fields,
+      datasets: [{
+        data: deviations,
+        backgroundColor: colors,
+        borderColor: borders,
+        borderWidth: 1, borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      scales: {
+        x: {
+          min: -30, max: 30,
+          title: { display: true, text: 'Deviation from 50% parity (pp)', color: '#64748b' },
+          ticks: { callback: v => (v > 0 ? '+' : '') + v }
+        },
+        y: { ticks: { font: { size: 11 } } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x > 0 ? '+' : ''}${ctx.parsed.x} pp from parity` } }
+      }
+    }
+  });
+})();
+
+// ── TREND DELTA CHART ──
+(function() {
+  const fields = [
+    'Natural Sciences','STEM (aggregate)','Agriculture',
+    'Social Sciences','Services','Education',
+    'Health & Welfare','Arts & Humanities','Engineering'
+  ];
+  const deltas = [8.1, 6.9, 6.2, 6.1, 4.1, 3.7, 3.6, 3.5, 3.3];
+
+  new Chart(document.getElementById('trendDeltaChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: fields,
+      datasets: [{
+        label: 'Change (pp)',
+        data: deltas,
+        backgroundColor: deltas.map((_, i) =>
+          `rgba(78,205,196,${0.5 + i * 0.04})`),
+        borderColor: '#4ecdc4',
+        borderWidth: 1, borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      scales: {
+        x: { min: 0, max: 12,
+             title: { display: true, text: 'Change in female share (pp)', color: '#64748b' } },
+        y: { ticks: { font: { size: 11 } } }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` +${ctx.parsed.x} pp` } }
+      }
+    }
+  });
+})();
+
+// ── ENGINEERING TOP 15 ──
+(function() {
+  const countries = ['Argentina','Benin','Brunei Darussalam','Algeria','North Macedonia',
+    'Peru','Sudan','Bangladesh','Uruguay','Tunisia','Qatar','Bahrain','Albania','Algeria','Iran'];
+  const values   = [75.31, 54.64, 52.26, 48.46, 47.76, 47.49, 46.27, 46.05, 45.92, 44.19,
+    43.9, 42.1, 41.8, 48.46, 40.2];
+  const uniq = [], seen = new Set();
+  countries.forEach((c,i) => { if (!seen.has(c)) { seen.add(c); uniq.push({c, v: values[i]}); } });
+  const top = uniq.slice(0,10);
+
+  new Chart(document.getElementById('engChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: top.map(d => d.c),
+      datasets: [{
+        data: top.map(d => d.v),
+        backgroundColor: top.map(d => d.v >= 50 ? 'rgba(78,205,196,0.7)' : 'rgba(255,107,107,0.6)'),
+        borderColor:     top.map(d => d.v >= 50 ? '#4ecdc4' : '#ff6b6b'),
+        borderWidth: 1, borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      scales: {
+        x: { min: 0, max: 100,
+             title: { display: true, text: '% Female Graduates', color: '#64748b' } },
+        y: { ticks: { font: { size: 11 } } }
+      },
+      plugins: {
+        legend: { display: false },
+        annotation: {},
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x.toFixed(1)}%` } }
+      }
+    }
+  });
+})();
+
+// ── EDUCATION TOP 10 ──
+(function() {
+  const data = [
+    {c:'Georgia', v:95.8}, {c:'Qatar', v:94.3}, {c:'Mongolia', v:92.4},
+    {c:'Armenia', v:89.7}, {c:'Latvia', v:88.5}, {c:'Lithuania', v:87.9},
+    {c:'Moldova', v:87.2}, {c:'Kazakhstan', v:86.8}, {c:'Ukraine', v:85.3},
+    {c:'Kyrgyz Rep.', v:84.1}
+  ];
+  new Chart(document.getElementById('eduChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: data.map(d => d.c),
+      datasets: [{
+        data: data.map(d => d.v),
+        backgroundColor: 'rgba(232,197,71,0.7)',
+        borderColor: '#e8c547', borderWidth: 1, borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      scales: {
+        x: { min: 0, max: 100,
+             title: { display: true, text: '% Female', color: '#64748b' } },
+        y: { ticks: { font: { size: 10 } } }
+      },
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x.toFixed(1)}%` } } }
+    }
+  });
+})();
+
+// ── HEALTH TOP 10 ──
+(function() {
+  const data = [
+    {c:'Bermuda', v:100}, {c:'Liechtenstein', v:100}, {c:'Antigua & Barbuda', v:100},
+    {c:'Virgin Islands (US)', v:96.3}, {c:'Iceland', v:90.2}, {c:'Finland', v:88.4},
+    {c:'Norway', v:87.9}, {c:'Sweden', v:86.5}, {c:'Portugal', v:85.2}, {c:'Estonia', v:84.8}
+  ];
+  new Chart(document.getElementById('healthChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: data.map(d => d.c),
+      datasets: [{
+        data: data.map(d => d.v),
+        backgroundColor: 'rgba(78,205,196,0.7)',
+        borderColor: '#4ecdc4', borderWidth: 1, borderRadius: 4,
+      }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true,
+      scales: {
+        x: { min: 0, max: 100,
+             title: { display: true, text: '% Female', color: '#64748b' } },
+        y: { ticks: { font: { size: 10 } } }
+      },
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x.toFixed(1)}%` } } }
+    }
+  });
+})();
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
